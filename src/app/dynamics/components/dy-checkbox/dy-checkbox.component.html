@@ -1,0 +1,4 @@
+<div class="custom-control custom-checkbox" [formGroup]="group">
+  <input type="checkbox" class="custom-control-input" id="{{field.name}}" [formControlName]="field.name">
+  <label class="custom-control-label" for="{{field.name}}">{{ field.label | translate }}</label>
+</div>

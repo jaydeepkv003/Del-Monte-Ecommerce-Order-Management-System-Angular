@@ -1,0 +1,122 @@
+<div class="col-12 pos mb-1 pl-2 pr-2 form-group has-float-label">
+  <span class="font-weight-bold">{{ "Search" | translate }}</span>
+  <input [(ngModel)]="searchKey" (keyup)="searchKeyUp()" class="form-control" />
+</div>
+<div class="col-12 float-left mb-3">
+  <div class="row">
+    <div class="col-xl-2 col-lg-3 col-12 col-sm-12 p-2 c-pointer" *ngFor="let product of localData; let i = index"
+      (click)="onSkuSelect(product)">
+      <div class="card active">
+        <div class="position-relative">
+          <a href="javascript:;">
+            <dy-image-box [ImageUrl]="product.defaultSku.primaryImage" [CssToApply]="'card-img-top pos-img'"
+              [ViewImage]="false">
+            </dy-image-box>
+          </a>
+        </div>
+        <div class="card-body p-0">
+          <div class="row pos-product-name">
+            <p class="mb-0 p-2 text-secondary font-weight-bold">
+              {{ product.name }} ({{ product.defaultSku.name }} {{ product.defaultSku.unit }})
+            </p>
+          </div>
+        </div>
+        <div class="modal-footer p-0" *ngFor="let stock of product.defaultSku.availableStock">
+          <div role="group" class="btn-group w-100 c-pointer">
+            <button class="btn font-weight-semibold text-left">{{ stock.key }}</button>
+            <button class="btn font-weight-bold text-right">{{ stock.value }}</button>
+          </div>
+        </div>
+        <div class="modal-footer p-0">
+          <div role="group" class="btn-group w-100 c-pointer">
+            <button class="btn font-weight-semibold text-left">{{ "MRP" | translate}}</button>
+            <button class="btn font-weight-bold text-right">{{ product.defaultSku.mrp | number: "1.2-2" }}</button>
+          </div>
+        </div>
+        <div class="modal-footer p-0">
+          <div role="group" class="btn-group w-100 c-pointer">
+            <button class="btn font-weight-semibold text-left">{{ "Deal Price" | translate}}</button>
+            <button
+              class="btn font-weight-bold text-right">{{ product.defaultSku.dealPrice | number: "1.2-2" }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #skuButtons>
+  <div *ngIf="firstStep">
+    <div class="modal-header">
+      <h6 class="modal-title pull-left">{{ selectedProduct.name }} ({{ selectedProduct.defaultSku.name }}
+        {{ selectedProduct.defaultSku.unit }})
+      </h6>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modelRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="col-12 mb-3" (click)="onSkuUpdate()">
+        <tpl-button title="Update Price and Data" icon="simple-icon-check"></tpl-button>
+      </div>
+      <div class="col-12 mb-3" (click)="onStockUpdate()">
+        <tpl-button title="Add Stock" icon="simple-icon-plus"></tpl-button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!firstStep">
+    <div class="modal-header">
+      <h6 class="modal-title pull-left">{{ selectedProduct.name }} ({{ selectedProduct.defaultSku.name }}
+        {{ selectedProduct.defaultSku.unit }})
+        <br>
+        <i class="font-weight-bold">
+          {{'Add Stock' | translate}}
+        </i>
+      </h6>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="firstStep =true">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="col-12 mb-3" *ngFor="let premise of premises">
+        <ng-template [ngTemplateOutlet]="premiseButton" [ngTemplateOutletContext]="{ $implicit: premise }">
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #premiseButton let-item>
+  <div class="card icon-cards-row">
+    <div class="card-body text-center pt-3">
+      <p class="text-secondary font-weight-bold mb-0">
+        {{ item.name }}
+      </p>
+      <p class="card-text font-weight-semibold mb-0">
+        {{ item.address }}
+      </p>
+    </div>
+    <div class="modal-footer p-0">
+      <div role="group" class="btn-group w-100 c-pointer">
+        <button class="btn font-weight-semibold">{{ 'Available Stock' | translate }}</button>
+        <button class="btn font-weight-bold">{{ item.availableStock }}</button>
+      </div>
+    </div>
+    <div class="modal-footer p-0">
+      <div role="group" class="btn-group w-100 c-pointer">
+        <button class="btn"
+          (click)="premiseStockUpdate(item, stockUM.Scan)">{{'Scan to Add Stock' | translate}}</button>
+        <button class="btn btn-primary"
+          (click)="premiseStockUpdate(item, stockUM.GenerateQR)">{{'Generate Codes' | translate}}</button>
+        <button class="btn"
+          (click)="premiseStockUpdate(item,stockUM.Directly)">{{'Add Stock Directly' | translate}}</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<dy-form-popup #formPopup></dy-form-popup>
+<dy-code-scan-popup #csPopup></dy-code-scan-popup>
+<dy-input-popup #inPopup></dy-input-popup>
+<dy-document-popup #docPopup></dy-document-popup>

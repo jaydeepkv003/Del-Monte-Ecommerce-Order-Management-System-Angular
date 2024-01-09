@@ -1,0 +1,185 @@
+<div class="col-12 pos mb-1 pl-2 pr-2 form-group has-float-label">
+  <span class="font-weight-bold">{{ "Search" | translate }}</span>
+  <input [(ngModel)]="searchKey" (keyup)="searchKeyUp()" class="form-control" />
+</div>
+
+<div class="col-lg-4 col-sm-12 float-right mb-3 pl-2 pt-2 pr-2 sticky-checkout">
+  <div class="card active">
+    <div class="card-header p-0 row">
+      <div class="col-8">
+        <h3 class="text-left m-2 ml-3 font-weight-bold h4">{{ "Checkout" | translate }}</h3>
+      </div>
+      <div class="col-4 text-right">
+        <a (click)="scanCode()">
+          <i class="scan-icon iconsminds-qr-code"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-borderless p-0 m-0 table-pos">
+        <thead class="alert-primary">
+          <tr>
+            <th></th>
+            <th scope="col">Name</th>
+            <th scope="col">Qty</th>
+            <th scope="col">Tax</th>
+            <th scope="col">Price</th>
+            <th></th>
+          </tr>
+        </thead>
+      </table>
+      <div class="pos-checkout-list">
+        <perfect-scrollbar class="scroll" [config]="{suppressScrollX: true, wheelPropagation: false}">
+          <table class="table table-borderless p-0 m-0 table-pos">
+            <tbody class="dashboard-list-with-thumbs">
+              <ng-container *ngFor="let item of cartList">
+                <tr *ngIf="item.offer">
+                  <td colspan="6" class="alert-success font-weight-bold">{{ item.offer.name }}</td>
+                </tr>
+                <tr class="border-bottom">
+                  <td class="p-2">
+                    <dy-image-box [ImageUrl]="item.primaryImage" class="toolbar-avatar md custom-avatar single-avatar">
+                    </dy-image-box>
+                  </td>
+                  <td>{{ item.name }}</td>
+                  <td class="font-weight-semibold">{{ item.quantity }}</td>
+                  <td class="font-weight-semibold">{{ item.tax }}</td>
+                  <td>{{ item.payablePerUnit | number: "1.2-2" }}</td>
+                  <td>
+                    <i class="simple-icon-trash c-pointer" (click)="removeFromCart(item)"></i>
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </perfect-scrollbar>
+      </div>
+      <table class="table table-borderless p-0 m-0 border-top table-pos">
+        <tfoot>
+          <tr class="border-bottom">
+            <th></th>
+            <th colspan="2" class="font-weight-bold h6">{{ 'Cart Total' | translate }}</th>
+            <th class="font-weight-bold h6">{{ cartTotal | number: "1.2-2" }}</th>
+            <th></th>
+          </tr>
+          <tr *ngIf="customer && cartDiscount > 0" class="border-bottom">
+            <th></th>
+            <th colspan="2" class="font-weight-bold h5"> {{ 'Total' | translate}}</th>
+            <th class="font-weight-bold h5">{{ cartTotal - cartDiscount | number: "1.2-2" }}</th>
+            <th></th>
+          </tr>
+          <tr *ngIf="customer && cartDiscount > 0" class="border-bottom">
+            <th></th>
+            <th colspan="2" class="font-weight-bold h6">
+              <span *ngIf="customer && customer.invMembership && customer.invMembership.name">
+                {{customer?.invMembership?.name | json}}</span>
+              Discount</th>
+            <th class="font-weight-bold h6">{{ cartDiscount | number: "1.2-2" }}</th>
+            <th></th>
+          </tr>
+          <tr class="border-bottom" *ngIf="customer && !cartDiscount">
+            <th></th>
+            <th colspan="2" class="font-weight-bold h6">
+              {{ customer.name | ellipsis: 30 }}
+            </th>
+            <th class="font-weight-bold h6" *ngIf="customer && customer.invMembership && customer.invMembership.name">
+              {{customer?.invMembership?.name | json}}</th>
+            <th *ngIf="!customer || !customer.invMembership || !customer.invMembership.name"></th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <a class="card active mt-2 c-pointer">
+    <div class="card-body p-0">
+      <table class="table table-borderless p-0 m-0">
+        <thead>
+          <tr>
+            <th class="text-center font-weight-bold h5 border-darken-4 alert-primary m-1" (click)="onCustomer()">
+              {{ "Member" | translate }}
+            </th>
+            <th class="text-center font-weight-bold h5 border-darken-4" (click)="payNow()">
+              {{ "Pay" | translate }} ({{ cartTotal - cartDiscount | number: "1.2-2" }})
+            </th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+  </a>
+</div>
+
+<div class="col-lg-8 col-sm-12 float-left mb-3">
+  <div class="row">
+    <div class="col-xl-3 col-6 p-2 c-pointer" *ngFor="let product of localData; let i = index"
+      (click)="addToCart(product)">
+      <div class="card active">
+        <div class="position-relative">
+          <a href="javascript:;">
+            <dy-image-box [ImageUrl]="product.defaultSku.primaryImage" [CssToApply]="'card-img-top pos-img'"
+              [ViewImage]="false">
+            </dy-image-box>
+          </a>
+        </div>
+        <div class="card-body p-0">
+          <div class="row pos-product-name">
+            <p class="mb-0 p-2 text-secondary font-weight-bold">
+              {{ product.name }} ({{ product.defaultSku.name }} {{ product.defaultSku.unit }})
+            </p>
+          </div>
+        </div>
+        <div class="modal-footer p-0">
+          <div role="group" class="btn-group w-100 c-pointer">
+            <button class="btn font-weight-bold text-left">{{ product.defaultSku.dealPrice | number: "1.2-2" }}</button>
+            <button class="btn font-weight-semibold text-right">
+              <i class="simple-icon-plus bold font-weight-bold"></i>
+            </button>
+          </div>
+        </div>
+        <div class="modal-footer p-0">
+          <div role="group" class="btn-group w-100 c-pointer">
+            <button class="btn font-weight-bold text-left">
+              {{ product.isTaxIncluded? "Tax Included":"Tax not Included" | translate}}</button>
+            <button class="btn font-weight-semibold text-right">
+              <i *ngIf="!product.isTaxIncluded" class="simple-icon-close bold font-weight-bold text-danger"></i>
+              <i *ngIf="product.isTaxIncluded" class="simple-icon-check bold font-weight-bold text-success"></i>
+            </button>
+          </div>
+        </div>
+        <div class="modal-footer p-0" *ngIf="product.defaultSku.discountRule">
+          <div role="group" class="btn-group w-100 c-pointer alert-success">
+            <button class="btn font-weight-bold">{{ product.defaultSku.discountRule.name | translate }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #skuButtons>
+  <div class="modal-header">
+    <h6 class="modal-title pull-left">{{'Pay Now:' | translate }}
+      <b>{{ cartTotal - cartDiscount | number: "1.2-2" }}</b>
+    </h6>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modelRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="col-12 mb-3" (click)="cardPayment()">
+      <tpl-button title="Card" icon="iconsminds-credit-card"></tpl-button>
+    </div>
+    <div class="col-12 mb-3" (click)="cashPayment()">
+      <tpl-button title="Cash" icon="iconsminds-money-bag"></tpl-button>
+    </div>
+    <div class="col-12 mb-3" (click)="scanAndPay()" *ngIf="gcService.globalConfig.vpa">
+      <tpl-button title="Scan and Pay" icon="iconsminds-qr-code"></tpl-button>
+    </div>
+  </div>
+</ng-template>
+
+<dy-code-scan-popup #csPopup></dy-code-scan-popup>
+<dy-cust-popup #custPopup></dy-cust-popup>
+<dy-input-popup #inPopup></dy-input-popup>
+<dy-document-popup #docPopup></dy-document-popup>

@@ -1,0 +1,41 @@
+<ng-container *ngIf="existingFiles.length">
+  <div class="row m-0 mb-1 no-gutters border border-light" *ngFor="let file of existingFiles">
+    <div class="col-3">
+      <dy-image-box [ImageUrl]="file" [CssToApply]="'img-thumbnail border-0'"></dy-image-box>
+    </div>
+    <div class="col-8 pl-2 pt-2">
+      <div>{{file| ellipsis:20}}</div>
+    </div>
+    <div class="col-1 pull-right pt-2 pr-2">
+      <i (click)="onRemoveExistingFile(file)" class="glyph-icon simple-icon-trash"></i>
+    </div>
+  </div>
+</ng-container>
+<div class="separator mb-2" *ngIf="existingFiles.length"></div>
+
+<ng-container *ngIf="uploadFileList.length">
+  <div class="row m-0 mb-1 no-gutters border border-light" *ngFor="let file of uploadFileList; let i = index;">
+    <div class="col-3">
+      <img [src]="imageBrowserUrl(file) | safeurl" class="img-thumbnail border-0" />
+    </div>
+    <div class="col-8 pl-2 pt-2">
+      <div>{{file.name| ellipsis:20}}</div>
+      <!-- <div class="text-primary text-extra-small">{{file.size | bytes}}</div> -->
+    </div>
+    <div class="col-1 pull-right pt-2 pr-2">
+      <i (click)="onRemoveNewFile(i)" class="glyph-icon simple-icon-trash"></i>
+    </div>
+  </div>
+</ng-container>
+<div class="separator mb-2" *ngIf="uploadFileList.length"></div>
+
+<dropzone #dropzones [config]="config" (addedFile)="onAddedFile($event)">
+</dropzone>
+<div [formGroup]="group" class="mb-3">
+  <input [formControlName]="fieldConfig.name" matInput type="text" hidden />
+  <ng-container *ngFor="let validation of fieldConfig.validations">
+    <div *ngIf="group.get(fieldConfig.name).hasError(validation.name) && form.submitted" class="text-danger">
+      {{ validation.message | translate }}
+    </div>
+  </ng-container>
+</div>

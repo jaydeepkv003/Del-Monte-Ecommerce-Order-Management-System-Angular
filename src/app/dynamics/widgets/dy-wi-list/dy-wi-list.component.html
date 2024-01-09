@@ -1,0 +1,17 @@
+<div class="col-lg-4 col-md-6 col-sm-12 float-left mb-3 rm-t-5" *ngIf="widgetConfig && wiService.widgetData">
+  <div class="card">
+    <div class="position-absolute card-top-buttons p-2 mt-1 mr-1" (click)="wiService.processData()">
+      <button class="btn btn-header-light icon-button">
+        <i class="simple-icon-refresh"></i>
+      </button>
+    </div>
+    <div class="card-body p-3">
+      <h5 class="card-title mb-3">{{ widgetConfig.title | translate }}</h5>
+      <hr>
+      <div class="dashboard-list-with-user scroll-mpr-0">
+        <dy-option-list *ngIf="wiService.widgetData" [title]="widgetConfig.title" [viewData]="wiService.widgetData">
+        </dy-option-list>
+      </div>
+    </div>
+  </div>
+</div>

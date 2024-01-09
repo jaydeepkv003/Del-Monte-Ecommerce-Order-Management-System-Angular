@@ -1,0 +1,61 @@
+<div class="menu" (click)="menuClicked($event)"
+  *ngIf="navigationService.menuItems && navigationService.menuItems.length > 0">
+  <div class="main-menu">
+    <perfect-scrollbar class="scroll" [config]="{suppressScrollX: true}">
+      <ul class="list-unstyled">
+        <li *ngFor="let item of filteredMenuItems(navigationService.menuItems)"
+          [ngClass]="{'active': (selectedParentMenu === item.state && viewingParentMenu === '') || viewingParentMenu === item.state}">
+          <a *ngIf="item.newWindow" [href]="item.state" rel="noopener noreferrer" target="_blank">
+            <i [ngClass]="item.icon ? item.icon: 'iconsminds-close'"></i>{{item.name | translate}}</a>
+          <a *ngIf="!item.newWindow && item.childItems && item.childItems.length"
+            (click)="openSubMenu($event,item); false" [href]="item.state">
+            <i [ngClass]="item.icon ? item.icon: 'iconsminds-close'"></i> {{item.name | translate}}</a>
+          <a *ngIf="!item.newWindow && (!item.childItems || (item.childItems &&  item.childItems.length===0))"
+            (click)="changeSelectedParentHasNoSubmenu(item.state); false" routerLink="/{{item.state}}">
+            <i [ngClass]="item.icon ? item.icon: 'iconsminds-close'"></i> {{item.name | translate}}</a>
+        </li>
+      </ul>
+    </perfect-scrollbar>
+  </div>
+  <div class="sub-menu">
+    <perfect-scrollbar class="scroll" [config]="{suppressScrollX: true}">
+      <ul class="list-unstyled" *ngFor="let item of filteredMenuItems(navigationService.menuItems)"
+        [attr.data-parent]="item.state"
+        [ngClass]="{'d-block': (selectedParentMenu === item.state && viewingParentMenu==='') || viewingParentMenu === item.state}">
+        <li *ngFor="let sub of filteredMenuItems(item.childItems)"
+          [ngClass]="{'active': urlParts[1] === sub.state ,'has-sub-item' : sub.childItems&& sub.childItems.length>0 }">
+          <a *ngIf="!sub.newWindow && (!sub.childItems || sub.childItems.length<=0)"
+            routerLink="/{{item.state}}/{{sub.state}}" routerLinkActive="active">
+            <i [ngClass]="item.icon"></i>
+            <!-- <i [ngClass]="sub.icon ? sub.icon: item.icon"></i> -->
+            <span class="d-inline-block">{{sub.name | translate}}</span>
+          </a>
+      </ul>
+    </perfect-scrollbar>
+  </div>
+</div>
+
+<!-- <a (click)="toggleCollapse(sub.state)" *ngIf="sub.childItems && sub.childItems.length > 0"
+    [ngClass]="{'rotate-arrow-icon opacity-50 c-pointer': true, 'collapsed': closedCollapseList.includes(sub.state)}">
+    <i class="simple-icon-arrow-down"></i>
+    <span class="d-inline-block">{{sub.name | translate}}</span>
+  </a>
+  <div [collapse]="closedCollapseList.includes(sub.state)" [isAnimated]="true">
+    <div *ngIf="sub.childItems && sub.childItems.length > 0">
+      <ul class="list-unstyled inner-level-menu">
+        <li *ngFor="let deepSub of filteredMenuItems(sub.childItems)"
+          [ngClass]="{'active': currentUrl === deepSub.state}">
+          <a *ngIf="deepSub.newWindow" routerLink="/{{deepSub.state}}" rel="noopener noreferrer"
+            target="_blank">
+            <i [ngClass]="sub.icon ? sub.icon: item.icon"></i>
+            <span class="d-inline-block">{{deepSub.name | translate}}</span>
+          </a>
+          <a *ngIf="!deepSub.newWindow && (!deepSub.childItems || deepSub.childItems.length<=0)"
+            [routerLink]="[deepSub.state]" routerLinkActive="active">
+            <i [ngClass]="sub.icon ? sub.icon: item.icon"></i>
+            <span class="d-inline-block">{{deepSub.name | translate}}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div> -->

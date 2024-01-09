@@ -1,0 +1,5 @@
+<img (click)="onImageView(template)" [src]="currrentImage" [class]="cssClasses" (error)="errorLoadImage()" />
+
+<ng-template #template>
+  <img [src]="currrentImage" (error)="errorLoadImage()" class="w-100" />
+</ng-template>

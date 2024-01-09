@@ -1,0 +1,197 @@
+<div class="col-lg-4 col-md-6 col-sm-12 float-left mb-3 rm-t-5" *ngIf="widgetConfig && wiService.widgetData">
+  <div class="card">
+    <div class="position-absolute card-top-buttons p-2 mt-1 mr-1" (click)="wiService.processData()">
+      <button class="btn btn-header-light icon-button">
+        <i class="simple-icon-refresh"></i>
+      </button>
+    </div>
+    <div class="card-body p-3" [hidden]="!widgetConfig">
+      <h5 class="card-title mb-3">{{ widgetConfig.title | translate }}</h5>
+      <hr />
+      <div class="scroll dashboard-list-with-thumbs">
+        <perfect-scrollbar class="scroll" [config]="{ suppressScrollX: true, wheelPropagation: false }">
+          <div class="d-flex flex-row mb-3 c-pointer" *ngFor="let order of wiService.widgetData"
+            (click)="processOrder(order)">
+            <a routerLink="#" class="d-block position-relative">
+              <dy-image-box [ImageUrl]="order?.productList[0]?.defaultSku?.primaryImage"
+                [CssToApply]="'list-thumbnail border-0 order-thumbnail'" [ViewImage]="false"></dy-image-box>
+              <span class="position-absolute badge-top-right badge badge-pill badge-primary">
+                {{ OrderState[order.orderStatus] }}
+              </span>
+            </a>
+            <div class="pl-3 pt-2 pr-2 pb-2">
+              <a routerLink="#">
+                <p class="list-item-heading mb-1">
+                  {{order.id}}# <span class="text-small font-weight-medium">
+                    {{ order?.dateTime | date: "dd-MM-yyyy hh:mm a" }}</span>
+                </p>
+                <div class="pr-4">
+                  <p class="text-muted mb-1 text-small">{{ order.products }}</p>
+                </div>
+              </a>
+            </div>
+          </div>
+        </perfect-scrollbar>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="col-lg-4 col-md-6 col-sm-12 float-left mb-3 rm-t-5" *ngIf="newOrder && edititngOrder">
+  <div class="card">
+    <div class="position-absolute card-top-buttons p-2 mt-1 mr-1" (click)="saveStockReduce()">
+      <button class="btn btn-header-light icon-button">
+        <i class="simple-icon-check"></i>
+      </button>
+    </div>
+    <div class="card-body p-3" [hidden]="!widgetConfig">
+      <h5 class="card-title mb-3">{{ "Process Order" | translate }} #{{edititngOrder.id}}</h5>
+      <hr />
+      <div class="scroll dashboard-list-with-thumbs">
+        <perfect-scrollbar class="scroll" [config]="{ suppressScrollX: true, wheelPropagation: false }">
+          <div class="d-flex flex-row mb-3 c-pointer" *ngFor="let skus of edititngOrder.skus"
+            (click)="getStockData(skus)">
+            <a routerLink="#" class="d-block position-relative">
+              <dy-image-box [ImageUrl]="skus?.primaryImage" [CssToApply]="'list-thumbnail border-0 order-thumbnail'"
+                [ViewImage]="true">
+              </dy-image-box>
+            </a>
+            <div class="pl-3 pt-2 pr-2 pb-2">
+              <a routerLink="#">
+                <p class="list-item-heading mb-1 text-small font-weight-bold">
+                  <label class="badge mb-1 font-weight-bold" [ngClass]="
+                        ((skus.scannedCode && skus.scannedCode.length == 0) || !skus.scannedCode)
+                        ? 'badge-danger'
+                        : (skus.scannedCode && skus.quantity > skus.scannedCode.length)
+                        ? 'badge-warning'
+                        : 'badge-success'
+                    ">{{ skus.quantity }} </label>
+                  {{ skus.name }}
+                </p>
+                <div class="pr-4">
+                  <ng-container *ngIf="skus.scannedCode">
+                    <p class="text-muted mb-1 text-small btn btn-light pt-1 pb-1" *ngFor="let code of skus.scannedCode">
+                      {{ code }}
+                    </p>
+                  </ng-container>
+                  <ng-container *ngIf="!skus.scannedCode">
+                    <p class="text-muted mb-1 text-small btn btn-light pt-1 pb-1">
+                      {{ "Tap here to scan code" | translate}}
+                    </p>
+                  </ng-container>
+                </div>
+              </a>
+            </div>
+          </div>
+        </perfect-scrollbar>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="col-lg-4 col-md-6 col-sm-12 float-left mb-3 rm-t-5" *ngIf="!newOrder && edititngOrder">
+  <div class="card">
+    <div class="position-absolute card-top-buttons p-2 mt-1 mr-1" (click)="processStep()">
+      <button class="btn btn-header-light icon-button">
+        <i class="simple-icon-plus"></i>
+      </button>
+    </div>
+    <div class="card-body p-3" [hidden]="!widgetConfig">
+      <h5 class="card-title mb-3">{{ "Process Order" | translate }} #{{edititngOrder.id}}</h5>
+      <hr />
+      <div class="scroll dashboard-list-with-thumbs scroll-mpr-0">
+        <perfect-scrollbar class="scroll" [config]="{ suppressScrollX: true, wheelPropagation: false }">
+          <aw-wizard [navBarLayout]="'large-empty-symbols'" [navBarLocation]="'left'">
+            <aw-wizard-step awCompletedStep *ngFor="let log of edititngOrder.logs">
+              <ng-template awWizardStepTitle>
+                <div class="w-100 d-block mb-1">{{ OrderState[log.orderStatus] }}</div>
+                <div class="w-100 d-block text-muted mb-1 font-weight-semibold text-small">
+                  {{ log?.dateTime | date: "dd-MM-yyyy hh:mm a" }}</div>
+                <div class="w-100 d-block text-muted mb-1 font-weight-normal text-small">{{ log?.description }}</div>
+              </ng-template>
+              <ng-template awWizardStepSymbol>
+                <i class="simple-icon-location-pin text-success"></i>
+              </ng-template>
+            </aw-wizard-step>
+          </aw-wizard>
+        </perfect-scrollbar>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="col-lg-4 col-md-6 col-sm-12 float-left mb-3 rm-t-5" *ngIf="edititngOrder">
+  <div class="card">
+    <div class="card-body p-3" [hidden]="!widgetConfig">
+      <h5 class="card-title mb-3">{{ "Order Details" | translate }} #{{edititngOrder.id}}</h5>
+      <hr />
+      <div class="scroll dashboard-list-with-thumbs">
+        <div class="model-header separator">
+          <div role="group" class="btn-group w-100 c-pointer">
+            <div class="btn font-weight-bold text-left pl-0"> {{'Name' | translate}} </div>
+            <div class="btn font-weight-semibold text-right pr-0"> {{edititngOrder?.shippingAddress?.addressName}}
+            </div>
+          </div>
+        </div>
+        <div class="model-header separator">
+          <div role="group" class="btn-group w-100 c-pointer">
+            <div class="btn font-weight-bold text-left pl-0"> {{'Address Type' | translate}} </div>
+            <div class="btn font-weight-semibold text-right pr-0"> {{edititngOrder?.shippingAddress?.addressType}}
+            </div>
+          </div>
+        </div>
+        <div class="model-header separator">
+          <div role="group" class="btn-group w-100 c-pointer">
+            <div class="btn font-weight-bold text-left pl-0"> {{'Address' | translate}} </div>
+            <div class="btn font-weight-semibold text-right pr-0"> {{edititngOrder?.shippingAddress?.address}}
+            </div>
+          </div>
+        </div>
+        <div class="model-header separator">
+          <div role="group" class="btn-group w-100 c-pointer">
+            <div class="btn font-weight-bold text-left pl-0"> {{'Area' | translate}} </div>
+            <div class="btn font-weight-semibold text-right pr-0"> {{edititngOrder?.shippingAddress?.area?.name}}
+            </div>
+          </div>
+        </div>
+        <div class="model-header separator">
+          <div role="group" class="btn-group w-100 c-pointer">
+            <div class="btn font-weight-bold text-left pl-0"> {{'City' | translate}} </div>
+            <div class="btn font-weight-semibold text-right pr-0"> {{edititngOrder?.shippingAddress?.city?.name}}
+            </div>
+          </div>
+        </div>
+        <div class="model-header separator">
+          <div role="group" class="btn-group w-100 c-pointer">
+            <div class="btn font-weight-bold text-left pl-0"> {{'State' | translate}} </div>
+            <div class="btn font-weight-semibold text-right pr-0"> {{edititngOrder?.shippingAddress?.state?.name}}
+            </div>
+          </div>
+        </div>
+        <div class="model-header separator">
+          <div role="group" class="btn-group w-100 c-pointer">
+            <div class="btn font-weight-bold text-left pl-0"> {{'Country' | translate}} </div>
+            <div class="btn font-weight-semibold text-right pr-0"> {{edititngOrder?.shippingAddress?.country?.name}}
+            </div>
+          </div>
+        </div>
+        <div class="model-header separator">
+          <div role="group" class="btn-group w-100 c-pointer">
+            <div class="btn font-weight-bold text-left pl-0"> {{'Pincode' | translate}} </div>
+            <div class="btn font-weight-semibold text-right pr-0"> {{edititngOrder?.shippingAddress?.pincode}}
+            </div>
+          </div>
+        </div>
+        <div class="model-header separator">
+          <div role="group" class="btn-group w-100 c-pointer">
+            <div class="btn font-weight-bold text-left pl-0"> {{'Payment' | translate}} </div>
+            <div class="btn font-weight-semibold text-right pr-0"> Panding </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<dy-code-scan-popup #csPopup></dy-code-scan-popup>
+<dy-confirm-popup #confPopup></dy-confirm-popup>
+<dy-form-popup #formPopup></dy-form-popup>

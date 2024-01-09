@@ -1,0 +1,28 @@
+<ng-template #template>
+  <div class="modal-header stickey-top">
+    <h4 class="modal-title pull-left" *ngIf="formService.dyFormConfig">{{ formService.dyFormConfig.title | translate}}
+    </h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form #form="ngForm" id="ngFormCust" [formGroup]="formService.dyForm" class="full-width" (submit)="onSubmit($event)"
+      *ngIf="formService.dyFormConfig && formService.dyFormConfig.properties">
+      <div *ngFor="let field of formService.dyFormConfig.properties" [hidden]="field.isHidden">
+        <span dyFormField *ngIf="!field.rebuildControl" [field]="field" [form]="form"
+          [group]="formService.dyForm"></span>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer stickey-bottom">
+    <button type="submit" class="btn btn-primary float-right" form="ngFormCust"
+      *ngIf="formService.dyFormConfig.isSave">{{ 'SAVE & SELECT' | translate}}</button>
+
+    <button type="button" class="btn btn-outline-primary float-right" form="ngFormCust" (click)="onReset()"
+      *ngIf="formService.dyFormConfig.isReset">{{'RESET' | translate }}</button>
+
+    <div *ngFor="let field of formService.dyFormConfig.buttons" dyFormField [field]="field" [form]="form"
+      [group]="formService.dyForm" [hidden]="field.isHidden"></div>
+  </div>
+</ng-template>

@@ -1,0 +1,275 @@
+<div class="row">
+  <div class="col-12">
+    <div class="display-options-container">
+      <div id="displayOptionsDoc" class="collapse d-block mb-sm-1"
+        *ngIf="tableService.accessDetails && tableService.accessDetails.isView">
+        <div class="d-inline-block">
+          <div class="search-sm d-inline-block float-md-left mr-1 align-top">
+            <input class="form-control" placeholder="{{ 'Search' | translate }}"
+              [(ngModel)]="tableService.localfilterValue" />
+          </div>
+        </div>
+        <div class="float-right mr-1">
+          <span class="text-muted text-small">Per Page </span>
+          <span dropdown class="d-inline-block position-relative mr-1">
+            <button class="btn btn-outline-dark btn-xs dropdown-toggle" type="button" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false" dropdownToggle>
+              {{ tableService.itemsPerPage }}
+            </button>
+            <div class="dropdown-menu dropdown-menu-right dropdown-menu-sm text-right" *dropdownMenu>
+              <li role="menuitem" *ngFor="let item of tableService.itemOptionsPerPage">
+                <a [ngClass]="
+                    item === tableService.itemsPerPage
+                      ? 'dropdown-item active'
+                      : 'dropdown-item'
+                  " (click)="tableService.itemsPerPage = item">{{ item }}</a>
+              </li>
+            </div>
+          </span>
+
+          <button class="btn btn-outline-success btn-xs mr-1" (click)="cardView = !cardView">
+            <i class="p-1 c-pointer" [ngClass]="cardView ? 'simple-icon-menu' : 'simple-icon-grid'"></i>
+          </button>
+
+          <button class="btn btn-outline-success btn-xs mr-1" (click)="tableService.onDownloadTable()">
+            <i class="simple-icon-cloud-download"></i>
+          </button>
+
+          <button class="btn btn-outline-success btn-xs mr-1" (click)="tableService.onImport()">
+            <i class="simple-icon-cloud-upload"></i>
+          </button>
+        </div>
+      </div>
+      <div class="separator mb-2"></div>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="
+    tableService.accessDetails && tableService.accessDetails.isView && cardView
+  ">
+  <ng-container *ngFor="
+      let row of tableService.viewData
+        | filterPaginate
+          : {
+              filter: tableService.localfilterValue,
+              itemsPerPage: tableService.itemsPerPage,
+              currentPage: currentPage,
+              filterCount: filterCount
+            }
+    ">
+    <div class="col-lg-3 col-md-6 col-12">
+      <div class="card mb-2">
+        <ng-container *ngFor="let item of tableService.dyColumns">
+          <div class="model-header p-3 separator" *ngIf="item.dataType === tableService.DataTypes.Image">
+            <div *ngIf="!tableService.isImageArray(row[item.name])">
+              <dy-image-box [ImageUrl]="row[item.name]" class="toolbar-avatar md custom-avatar single-avatar">
+              </dy-image-box>
+            </div>
+            <div *ngIf="tableService.isImageArray(row[item.name])" class="overflow-x-auto mr-1">
+              <span *ngFor="let image of row[item.name]">
+                <dy-image-box [ImageUrl]="image" class="toolbar-avatar md custom-avatar"></dy-image-box>
+              </span>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngFor="let item of tableService.dyColumns; let i = index">
+          <div class="modal-footer p-0" [ngClass]="i === 0 ? 'no-border' : ''"
+            *ngIf="item.dataType !== tableService.DataTypes.Image">
+            <div role="group" class="btn-group w-100 c-pointer">
+              <div class="btn font-weight-bold text-left">
+                {{ item.label | translate }}
+              </div>
+              <div class="btn font-weight-semibold text-right">
+                <span [ngSwitch]="item.dataType">
+                  <ng-template [ngSwitchCase]="tableService.DataTypes.Currency">
+                    {{ row[item.name] | currency: "INR" }}
+                  </ng-template>
+                  <ng-template [ngSwitchCase]="tableService.DataTypes.Number">
+                    {{ row[item.name] | number }}
+                  </ng-template>
+                  <ng-template [ngSwitchCase]="tableService.DataTypes.Icon">
+                    <i class="{{ row[item.name] }}"></i>
+                  </ng-template>
+                  <ng-template [ngSwitchCase]="tableService.DataTypes.Boolean">
+                    <i *ngIf="row[item.name]" class="simple-icon-check text-success"></i>
+                    <i *ngIf="!row[item.name]" class="simple-icon-close text-danger"></i>
+                  </ng-template>
+                  <ng-template [ngSwitchCase]="tableService.DataTypes.Date">
+                    {{ row[item.name] | date: "dd-MM-yyyy" }}
+                  </ng-template>
+                  <ng-template [ngSwitchCase]="tableService.DataTypes.DateTime">
+                    {{ row[item.name] | date: "dd-MM-yyyy hh:mm a" }}
+                  </ng-template>
+                  <ng-template [ngSwitchCase]="tableService.DataTypes.Time">
+                    {{ row[item.name] | date: "hh:mm a" }}
+                  </ng-template>
+                  <ng-template ngSwitchDefault>
+                    <label class="word-break p-0 m-0" tooltip="{{ row[item.name] }}" placement="bottom">
+                      {{ row[item.name] | ellipsis: 20 }}
+                    </label>
+                  </ng-template>
+                </span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <div class="modal-footer float-right p-2 pr-3" *ngIf="
+            tableService.tableConfig &&
+            (tableService.tableConfig.isActions ||
+              tableService.tableConfig.isDocument)
+          ">
+          <button type="button" *ngIf="
+              tableService.accessDetails &&
+              tableService.accessDetails.isEdit &&
+              tableService.tableConfig.isActions
+            " class="btn btn-outline-success btn-xs mr-1" (click)="onEditEvent(row.id)">
+            <i class="simple-icon-note"></i>
+          </button>
+          <button type="button" *ngIf="
+              tableService.accessDetails &&
+              tableService.tableConfig.isDocument &&
+              tableService.accessDetails.isEdit
+            " class="btn btn-outline-info btn-xs mr-1" (click)="onDocumentEvent(row.id)">
+            <i class="simple-icon-doc"></i>
+          </button>
+          <button type="button" *ngIf="
+              tableService.accessDetails &&
+              tableService.accessDetails.isDelete &&
+              tableService.tableConfig.isActions
+            " class="btn btn-outline-danger btn-xs" (click)="onDeleteEvent(row.id)">
+            <i class="simple-icon-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <div class="col-12 mb-2">
+    <div class="card p-4">
+      <div class="d-flex justify-content-center" *ngIf="filterCount.count >= tableService.itemsPerPage">
+        <pagination [totalItems]="filterCount.count" [itemsPerPage]="tableService.itemsPerPage" [maxSize]="5"
+          [(ngModel)]="currentPage" [customNextTemplate]="nextTemplate" [customPreviousTemplate]="prevTemplate"
+          [customFirstTemplate]="firstTemplate" [customLastTemplate]="lastTemplate" [boundaryLinks]="true"
+          class="no-margin">
+        </pagination>
+      </div>
+      <div *ngIf="filterCount.count < tableService.itemsPerPage">
+        {{ filterCount.count }} {{ "total" | translate }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card" *ngIf="!cardView">
+  <div class="card-body" *ngIf="tableService.accessDetails && tableService.accessDetails.isView">
+    <ngx-datatable [columnMode]="ColumnMode.flex" [rows]="tableService.viewData | filter: tableService.localfilterValue"
+      [headerHeight]="30" [limit]="tableService.itemsPerPage" [footerHeight]="80">
+      <ngx-datatable-column *ngFor="let item of tableService.dyColumns" [name]="item.label" [sortable]="item.sortable"
+        [flexGrow]="1">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <span [ngSwitch]="item.dataType">
+            <ng-template [ngSwitchCase]="tableService.DataTypes.Currency">
+              {{ row[item.name] | currency: "INR" }}
+            </ng-template>
+            <ng-template [ngSwitchCase]="tableService.DataTypes.Number">
+              {{ row[item.name] | number }}
+            </ng-template>
+            <ng-template [ngSwitchCase]="tableService.DataTypes.Image">
+              <div *ngIf="!tableService.isImageArray(row[item.name])">
+                <dy-image-box [ImageUrl]="row[item.name]" class="toolbar-avatar md custom-avatar single-avatar">
+                </dy-image-box>
+              </div>
+              <div *ngIf="tableService.isImageArray(row[item.name])" class="overflow-x-auto mr-1">
+                <span *ngFor="let image of row[item.name]">
+                  <dy-image-box [ImageUrl]="image" class="toolbar-avatar md custom-avatar"></dy-image-box>
+                </span>
+              </div>
+            </ng-template>
+            <ng-template [ngSwitchCase]="tableService.DataTypes.Icon">
+              <i class="{{ row[item.name] }}"></i>
+            </ng-template>
+            <ng-template [ngSwitchCase]="tableService.DataTypes.Boolean">
+              <i *ngIf="row[item.name]" class="simple-icon-check text-success"></i>
+              <i *ngIf="!row[item.name]" class="simple-icon-close text-danger"></i>
+            </ng-template>
+            <ng-template [ngSwitchCase]="tableService.DataTypes.Date">
+              {{ row[item.name] | date: "dd-MM-yyyy" }}
+            </ng-template>
+            <ng-template [ngSwitchCase]="tableService.DataTypes.DateTime">
+              {{ row[item.name] | date: "dd-MM-yyyy hh:mm a" }}
+            </ng-template>
+            <ng-template [ngSwitchCase]="tableService.DataTypes.Time">
+              {{ row[item.name] | date: "hh:mm a" }}
+            </ng-template>
+            <ng-template ngSwitchDefault>
+              <label class="word-break" tooltip="{{ row[item.name] }}" placement="bottom">
+                {{ row[item.name] | ellipsis: 20 }}
+              </label>
+            </ng-template>
+          </span>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column *ngIf="
+          tableService.tableConfig &&
+          (tableService.tableConfig.isActions ||
+            tableService.tableConfig.isDocument)
+        " name="Action" [flexGrow]="1" sortable="false">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <button type="button" *ngIf="
+              tableService.accessDetails &&
+              tableService.accessDetails.isEdit &&
+              tableService.tableConfig.isActions
+            " class="btn btn-outline-success btn-xs mr-1" (click)="onEditEvent(row.id)">
+            <i class="simple-icon-note"></i>
+          </button>
+          <button type="button" *ngIf="
+              tableService.accessDetails &&
+              tableService.tableConfig.isDocument &&
+              tableService.accessDetails.isEdit
+            " class="btn btn-outline-info btn-xs mr-1" (click)="onDocumentEvent(row.id)">
+            <i class="simple-icon-doc"></i>
+          </button>
+          <button type="button" *ngIf="
+              tableService.accessDetails &&
+              tableService.accessDetails.isDelete &&
+              tableService.tableConfig.isActions
+            " class="btn btn-outline-danger btn-xs" (click)="onDeleteEvent(row.id)">
+            <i class="simple-icon-trash"></i>
+          </button>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-footer *ngIf="
+          tableService.viewData &&
+          tableService.viewData.length >= tableService.itemsPerPage
+        ">
+        <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+          let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-limit="limit">
+          <div class="w-100 d-flex justify-content-center">
+            <pagination [totalItems]="rowCount" [itemsPerPage]="pageSize" [maxSize]="5" [(ngModel)]="currentPage"
+              (pageChanged)="table.onFooterPage($event)" [customNextTemplate]="nextTemplate"
+              [customPreviousTemplate]="prevTemplate" [customFirstTemplate]="firstTemplate"
+              [customLastTemplate]="lastTemplate" [boundaryLinks]="true">
+            </pagination>
+          </div>
+        </ng-template>
+      </ngx-datatable-footer>
+    </ngx-datatable>
+  </div>
+</div>
+
+<dy-confirm-popup #confPopup></dy-confirm-popup>
+<dy-import-popup #impPopup></dy-import-popup>
+<ng-template #nextTemplate let-disabled="disabled" let-currentPage="currentPage">
+  <i class="simple-icon-arrow-right"></i>
+</ng-template>
+<ng-template #prevTemplate let-disabled="disabled" let-currentPage="currentPage">
+  <i class="simple-icon-arrow-left"></i>
+</ng-template>
+<ng-template #lastTemplate let-disabled="disabled" let-currentPage="currentPage">
+  <i class='simple-icon-control-end'></i>
+</ng-template>
+<ng-template #firstTemplate let-disabled="disabled" let-currentPage="currentPage">
+  <i class='simple-icon-control-start'></i>
+</ng-template>

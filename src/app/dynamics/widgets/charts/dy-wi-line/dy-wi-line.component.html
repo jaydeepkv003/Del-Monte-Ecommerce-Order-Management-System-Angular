@@ -1,0 +1,14 @@
+<div class="col-md-6 col-sm-12 float-left mb-3 rm-t-5" [hidden]="!widgetConfig">
+  <div class="card">
+    <div class="position-absolute card-top-buttons p-2 mt-1 mr-1" (click)="wiService.processData()">
+      <button class="btn btn-header-light icon-button">
+        <i class="simple-icon-refresh"></i>
+      </button>
+    </div>
+    <div class="card-body p-3" [hidden]="!widgetConfig">
+      <h5 class="card-title mb-3">{{ widgetConfig.title | translate }}</h5>
+      <hr>
+      <div class="chart-container"><canvas #chart></canvas></div>
+    </div>
+  </div>
+</div>

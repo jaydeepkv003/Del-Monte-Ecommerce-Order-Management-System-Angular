@@ -1,0 +1,12 @@
+<dy-dash-page *ngIf="currentPageType === PageTypes.Dash"></dy-dash-page>
+
+
+<dy-ext-page [IsReport]="currentPageType === PageTypes.Report" [IsCrud]="currentPageType === PageTypes.Crud"
+*ngIf="currentPageType === PageTypes.CrudExtend || currentPageType === PageTypes.Report || currentPageType === PageTypes.Crud">
+</dy-ext-page>
+
+<!-- <dy-crud-page *ngIf="currentPageType === PageTypes.Crud"></dy-crud-page> -->
+<!-- <dy-crud-page *ngIf="currentPageType === PageTypes.Report" [IsReport]="currentPageType === PageTypes.Crud"></dy-crud-page> -->
+<!-- <dy-report-page *ngIf="currentPageType === PageTypes.Report"></dy-report-page> -->
+<!-- <dy-crudextent-page *ngIf="currentPageType === PageTypes.CrudExtend"></dy-crudextent-page> -->
+<!-- <dy-feedback-page *ngIf="currentPageType === PageTypes.Feedback"></dy-feedback-page> -->

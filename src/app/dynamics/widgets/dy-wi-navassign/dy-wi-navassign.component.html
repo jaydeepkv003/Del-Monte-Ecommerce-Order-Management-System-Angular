@@ -1,0 +1,180 @@
+<div class="col-12">
+  <div class="row app-row">
+    <div class="col-12">
+      <div class="card active">
+        <div class="card-body" *ngIf="!navigationData.length">
+          <div class="row ml-1" accordion-heading (click)="$event.stopPropagation();">
+            <div class="col-12 pr-0">
+              <label
+                class="font-weight-semibold p-0 m-0">{{ 'Select User or User type to assign navigations' | translate }}</label>
+            </div>
+          </div>
+        </div>
+        <div class="card-body p-0 m-0" *ngIf="navigationData.length">
+          <div class="row custom-checkbox ml-1 p-4" accordion-heading (click)="$event.stopPropagation();">
+            <div class="col-3 pr-0">
+              <input type="checkbox" class="custom-control-input" id="allSelect"
+                (change)="allPermission($event, navigationData)"
+                [checked]="allSelect && allCreate && allDelete && allEdit && allView">
+              <label class="custom-control-label font-weight-semibold"
+                for="allSelect">{{ 'Select All' | translate }}</label>
+            </div>
+            <div class="col-2 pr-0">
+              <input type="checkbox" class="custom-control-input" id="allCreate"
+                (change)="allPermission($event, navigationData, 'C')" [checked]="allCreate">
+              <label class="custom-control-label font-weight-semibold"
+                for="allCreate">{{ 'Create' | translate }}</label>
+            </div>
+            <div class="col-2 pr-0">
+              <input type="checkbox" class="custom-control-input" id="allView"
+                (change)="allPermission($event, navigationData, 'V')" [checked]="allView">
+              <label class="custom-control-label font-weight-semibold" for="allView">{{ 'View' | translate }}</label>
+            </div>
+            <div class="col-2 pr-0">
+              <input type="checkbox" class="custom-control-input" id="allEdit"
+                (change)="allPermission($event, navigationData, 'E')" [checked]="allEdit">
+              <label class="custom-control-label font-weight-semibold" for="allEdit">{{ 'Edit' | translate }}</label>
+            </div>
+            <div class="col-2 pr-0">
+              <input type="checkbox" class="custom-control-input" id="allDelete"
+                (change)="allPermission($event, navigationData, 'D')" [checked]="allDelete">
+              <label class="custom-control-label font-weight-semibold"
+                for="allDelete">{{ 'Delete' | translate }}</label>
+            </div>
+            <div class="col-1">
+              <button type="button" class="btn btn-success btn-xs" (click)="saveData()">
+                <i class="iconsminds-save"></i>
+              </button>
+            </div>
+          </div>
+          <ng-template [ngTemplateOutlet]="navAssign" [ngTemplateOutletContext]="{ $implicit: navigationData }">
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<dy-menu>
+  <tabset class="card-tabs h-100" [justified]="true">
+    <tab [heading]="'User Types' | translate" class="card-body h-100">
+      <div class="form-group">
+        <input type="text" class="form-control rounded-100" placeholder="Search" [(ngModel)]="userTypeFilter"
+          id="search-box" (input)="userTypeFilterFn(userTypeFilter)" />
+      </div>
+      <div class="chat-app-tab-pane-contacts">
+        <perfect-scrollbar class="scroll" [config]="{suppressScrollX: true, wheelPropagation: false}">
+          <div class="d-flex flex-row mb-3 border-bottom pb-3 c-pointer" *ngFor="let data of dataList"
+            (click)="fillPermissions(data, false);">
+            <a class="d-flex">
+              <dy-alphabet [Character]='data.userType'></dy-alphabet>
+            </a>
+            <div class="d-flex flex-grow-1 min-width-zero">
+              <div
+                class="m-2 pl-0 align-self-center d-flex flex-column flex-lg-row justify-content-between min-width-zero">
+                <div class="min-width-zero">
+                  <a>
+                    <p class="mb-0 truncate" tooltip="{{data.userType}}" placement="bottom">
+                      {{ data.userType | ellipsis: 20 }}
+                    </p>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </perfect-scrollbar>
+      </div>
+    </tab>
+    <tab [heading]="'Users' | translate" class="card-body h-100">
+      <div class="form-group">
+        <input type="text" class="form-control rounded-100" placeholder="Search" [(ngModel)]="userFilter"
+          id="search-box" (input)="userFilterFn(userFilter)" />
+      </div>
+      <div class="chat-app-tab-pane-contacts">
+        <perfect-scrollbar class="scroll" [config]="{suppressScrollX: true, wheelPropagation: false}">
+          <div class="d-flex flex-row mb-3 border-bottom pb-3 c-pointer" *ngFor="let data of subDataList"
+            (click)="fillPermissions(data, true);">
+            <a class="d-flex">
+              <dy-alphabet [Character]='data.username'></dy-alphabet>
+            </a>
+            <div class="d-flex flex-grow-1 min-width-zero">
+              <div
+                class="m-2 pl-0 align-self-center d-flex flex-column flex-lg-row justify-content-between min-width-zero">
+                <div class="min-width-zero">
+                  <a>
+                    <p class="mb-0 truncate" tooltip="{{data.username}}" placement="bottom">
+                      {{ data.username | ellipsis: 20 }}
+                    </p>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </perfect-scrollbar>
+      </div>
+    </tab>
+  </tabset>
+</dy-menu>
+
+<ng-template #navAssign let-item>
+  <accordion [isAnimated]="true" [closeOthers]="true">
+    <accordion-group *ngFor="let data of item" [panelClass]="'border'" [isOpen]="false">
+      <div class="row custom-checkbox ml-1" accordion-heading>
+        <div class="col-3 pr-0">
+          <span (click)="$event.stopPropagation();">
+            <input type="checkbox" class="custom-control-input" id="{{data.id}}" (change)="permission($event, data)"
+              [checked]="data.isCreate && data.isView && data.isEdit && data.isDelete">
+            <label class="custom-control-label font-weight-semibold" for="{{data.id}}">
+              {{ data.name | translate }}
+              <span *ngIf="data.pageType === PageTypes.Report">({{'Report' | translate}})</span>
+              <span *ngIf="data.pageType === PageTypes.Dash">({{'Dashboard' | translate}})</span>
+            </label>
+          </span>
+        </div>
+        <div class="col-2 pr-0">
+          <span (click)="$event.stopPropagation();" *ngIf="data.pageType !== PageTypes.Dash ">
+            <input type="checkbox" class="custom-control-input" id="{{data.id}}C"
+              (change)="permission($event, data, 'C')" [checked]="data.isCreate">
+            <label class="custom-control-label" for="{{data.id}}C">
+              <span *ngIf="data.pageType !== PageTypes.Report">{{'Create' | translate}}</span>
+              <span *ngIf="data.pageType === PageTypes.Report">{{'Search' | translate}}</span>
+            </label>
+          </span>
+        </div>
+        <div class="col-2 pr-0">
+          <span (click)="$event.stopPropagation();">
+            <input type="checkbox" class="custom-control-input" id="{{data.id}}V"
+              (change)="permission($event, data, 'V')" [checked]="data.isView">
+            <label class="custom-control-label" for="{{data.id}}V">{{ 'View' | translate }}</label>
+          </span>
+        </div>
+        <div class="col-2 pr-0">
+          <span (click)="$event.stopPropagation();" *ngIf="data.pageType !== PageTypes.Report">
+            <input type="checkbox" class="custom-control-input" id="{{data.id}}E"
+              (change)="permission($event, data, 'E')" [checked]="data.isEdit">
+            <label class="custom-control-label" for="{{data.id}}E">{{ 'Edit' | translate }}</label>
+          </span>
+        </div>
+        <div class="col-2 pr-0">
+          <span (click)="$event.stopPropagation();"
+            *ngIf="data.pageType !== PageTypes.Dash && data.pageType !== PageTypes.Report">
+            <input type="checkbox" class="custom-control-input" id="{{data.id}}D"
+              (change)="permission($event, data, 'D')" [checked]="data.isDelete">
+            <label class="custom-control-label" for="{{data.id}}D">{{ 'Delete' | translate }}</label>
+          </span>
+        </div>
+        <div class="col-1">
+          <button type="button" class="btn btn-xs mr-1" *ngIf="data.childItems.length">
+            <i class="simple-icon-arrow-down-circle"></i>
+          </button>
+        </div>
+      </div>
+      <div class="row" *ngIf="data.childItems.length">
+        <div class="card-body p-0 m-0">
+          <ng-template [ngTemplateOutlet]="navAssign" [ngTemplateOutletContext]="{ $implicit: data.childItems }">
+          </ng-template>
+        </div>
+      </div>
+    </accordion-group>
+  </accordion>
+</ng-template>

@@ -1,0 +1,10 @@
+<div class="form-group has-float-label" [formGroup]="group">
+  <span>{{ field.label | translate }}</span>
+  <textarea class="form-control" [formControlName]="field.name" rows="2" maxlength="{{ field.maxLength }}"
+    minlength="{{ field.minLength }}"></textarea>
+  <ng-container *ngFor="let validation of field.validations">
+    <div *ngIf="group.get(field.name).hasError(validation.name) && form.submitted" class="text-danger">
+      {{ validation.message | translate }}
+    </div>
+  </ng-container>
+</div>

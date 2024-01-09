@@ -1,0 +1,12 @@
+<div class="form-group has-float-label" [formGroup]="group">
+  <span>{{ field.label | translate }}</span>
+  <input type="text" [formControlName]="field.name" hidden>
+  <input type="text" class="form-control" bsDatepicker [container]="'html'"
+    value="{{existingValue| date: 'dd-MM-yyyy'}}" [bsConfig]="{ dateInputFormat: 'DD-MM-YYYY' }"
+    (bsValueChange)="dateChange($event);">
+  <ng-container *ngFor="let validation of field.validations">
+    <div *ngIf="group.get(field.name).hasError(validation.name) && form.submitted" class="text-danger">
+      {{ validation.message | translate }}
+    </div>
+  </ng-container>
+</div>

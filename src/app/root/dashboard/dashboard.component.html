@@ -1,0 +1,11 @@
+<div id="app-container" [className]="sidebar.containerClassnames">
+  <app-topnav [hidden]="dashboardService.isFullScreenDash"></app-topnav>
+  <app-sidebar [hidden]="dashboardService.isFullScreenDash"></app-sidebar>
+  <main [ngClass]="{'m-0 mr-3 ml-3 p-1 pt-0': dashboardService.isFullScreenDash}">
+    <div class="container-fluid">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+  <app-color-switcher *ngIf="isMultiColorActive"></app-color-switcher>
+  <simple-notifications></simple-notifications>
+</div>

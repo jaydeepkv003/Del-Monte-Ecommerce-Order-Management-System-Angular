@@ -1,0 +1,14 @@
+<div class="card auth-card">
+  <div class="position-relative image-side ">
+    <p class=" text-white h2">MAGIC IS IN THE DETAILS</p>
+    <p class="white mb-0">
+      Please use your credentials to login.
+      <br>If you are not a member, please contact info@isavgo.com.
+    </p>
+  </div>
+  <div class="form-side">
+    <a class="c-pointer"> <span class="logo-single"></span> </a>
+    <dy-form-simple [formConfig]="formConfig" (submit)="onSubmit($event)" [reset]="formReset">
+    </dy-form-simple>
+  </div>
+</div>

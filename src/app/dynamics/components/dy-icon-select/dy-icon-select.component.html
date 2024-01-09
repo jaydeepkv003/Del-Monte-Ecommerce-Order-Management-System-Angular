@@ -1,0 +1,14 @@
+<label class="form-group has-float-label" [formGroup]="group">
+  <ng-select [hideSelected]="true" [bindLabel]="field.name" [formControlName]="field.name">
+    <ng-option *ngFor="let item of field.options" value="{{ item.key }}">
+      <i class="glyph-icon {{ item.value }}"></i> &nbsp;
+      {{ item.value }}
+    </ng-option>
+  </ng-select>
+  <span>{{ field.label | translate }}</span>
+  <ng-container *ngFor="let validation of field.validations">
+    <div *ngIf="group.get(field.name).hasError(validation.name) && form.submitted" class="text-danger">
+      {{ validation.message | translate }}
+    </div>
+  </ng-container>
+</label>

@@ -1,0 +1,11 @@
+<div *ngFor="let wiData of wiService.widgetData" class="col-lg-2 col-md-3 col-sm-6 col-xs-12 float-left mb-3">
+  <div class="card icon-cards-row">
+    <div class="card-body text-center">
+      <i [class]="wiData.icon"></i>
+      <p class="card-text font-weight-semibold mb-0">
+        {{ wiData.title | translate}}: {{ wiData.data }} {{wiData.subTitle}}
+      </p>
+      <p class="lead text-center">{{ wiData.badgeData }}</p>
+    </div>
+  </div>
+</div>

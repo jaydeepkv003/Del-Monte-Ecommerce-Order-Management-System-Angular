@@ -1,0 +1,16 @@
+<label class="form-group has-float-label" [formGroup]="group">
+  <ng-select [hideSelected]="false" [bindLabel]="field.name" [formControlName]="field.name" [multiple]="true"
+    [closeOnSelect]="false" [items]="field.options">
+    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+      <input id="item-{{index}}" type="checkbox" [ngModel]="item$.selected" /> {{item.name}}
+    </ng-template>
+
+    <!-- <ng-option *ngFor="let item of field.options" value="{{ item.key }}">{{ item.value }}</ng-option> -->
+  </ng-select>
+  <span>{{ field.label | translate }}</span>
+  <ng-container *ngFor="let validation of field.validations">
+    <div *ngIf="group.get(field.name).hasError(validation.name) && form.submitted" class="text-danger">
+      {{ validation.message | translate }}
+    </div>
+  </ng-container>
+</label>
